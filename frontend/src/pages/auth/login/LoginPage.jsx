@@ -5,12 +5,48 @@ import XSvg from "../../../components/svg/X";
 import { MdOutlineMail } from "react-icons/md";
 import { MdPassword } from "react-icons/md";
 import { Link } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   });
+
+  const queryClient = useQueryClient();
+
+  const {mutate: loginMutation, isError, isPending, error} = useMutation({
+    mutationFn: async ({username, password}) => {
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({username, password})
+        })
+
+        const data = await res.json();
+        if(!res.ok) throw new Error(data.error || "Failed to login");
+
+        return data;
+
+      } catch (error) {
+        console.log("Error in login mutation", error);
+        throw error;
+      }
+    },
+
+    onSuccess: () => {
+      toast.success("Login successfully");
+      queryClient.invalidateQueries({queryKey: ["authUser"]});
+    },
+
+    onError: (error) => {
+      toast.error(error.message);
+    }
+  })
 
   const handleInputChange = (e) => {
     const {name, value} = e.target;
@@ -24,10 +60,9 @@ const LoginPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log(formData);
+    loginMutation(formData);
   };
 
-  const isError = false;
   return (
     <div className='w-full mx-auto flex h-screen px-10 justify-center items-center'>
       <div className='flex-1 hidden lg:flex items-center justify-center'>
@@ -68,10 +103,10 @@ const LoginPage = () => {
             </label>
 
             <button className='btn rounded-full btn-primary text-white'>
-              Log in
+              {isPending ? "Loging in..." : "Log in"}
             </button>
               {isError && (
-                <p className='text-red-500'>Something went wrong</p>
+                <p className='text-red-500'>{error.message}</p>
               )}
         </form>
 
