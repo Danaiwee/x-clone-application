@@ -70,7 +70,7 @@ const Sidebar = () => {
               className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
             >
               <IoNotifications className="size-8" />
-              <span className="text-lg hidden md:block">Profile</span>
+              <span className="text-lg hidden md:block">Notifications</span>
             </Link>
           </li>
 
