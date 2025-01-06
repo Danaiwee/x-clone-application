@@ -36,7 +36,7 @@ const HomePage = () => {
         <CreatePost />
 
         {/*All Posts*/}
-        <Posts />
+        <Posts feedType={feedType} />
 
       </div>
     </>
