@@ -9,11 +9,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from 'react-hot-toast';
 
 import LoadingSpinner from './LoadingSpinner';
+import { formatPostDate } from "../../utils/date";
 
 const Post = ({ post }) => {
   const [comment, setComment] = useState("");
   const {data: authUser} = useQuery({queryKey: ['authUser']});
   const isMyPost = authUser._id === post.user._id;
+  const postOwner = post.user;
+  const isLiked = post.likes.includes(authUser._id);
+  const formattedDate = formatPostDate(post.createdAt);
 
   const queryClient = useQueryClient();
 
@@ -38,14 +42,10 @@ const Post = ({ post }) => {
       queryClient.invalidateQueries({queryKey: ["posts"]});
     },
   });
-  
   const handleDeletePost = () => {
     deletePost();
   };
-
-  const postOwner = post.user;
-  const isLiked = post.likes.includes(authUser._id);
-
+  
   const {mutate: likePost, isPending: isLiking} = useMutation({
     mutationFn: async () => {
       try {
@@ -82,20 +82,48 @@ const Post = ({ post }) => {
       toast.error(error.message);
     }
   });
-
   const handleLikePost = () => {
     if(isLiking) return;
     likePost();
   };
 
-  const formattedDate = "1h";
+  const {mutate: commentPost, isPending: isCommenting} = useMutation({
+    mutationFn: async () => {
+      try {
+        const res = await fetch(`/api/posts/comment/${post._id}`, {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({text: comment})
+        });
 
-  const isCommenting = false;
+        const data = await res.json();
+        if(!res.ok) throw new Error(data.error);
 
+        return data;
 
-  const handlePostComment = () => {};
+      } catch (error) {
+        console.log("Error in comment mutation", error.message);
+        throw new Error(error);
+      }
+    },
 
+    onSuccess: () => {
+      toast.success("Comment posted sucessfully");
+      queryClient.invalidateQueries({queryKey: ['posts']});
+    },
 
+    onError: (error) => {
+      toast.error(error.message);
+    }
+  });
+  const handlePostComment = () => {
+    commentPost(comment);
+    document.getElementById(`comments_modal${post._id}`).close();
+  };
+
+  
   return (
     <>
       <div className="flex gap-2 items-start p-4 border-b border-gray-700">
