@@ -15,6 +15,9 @@ import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { formatMemberSinceDate } from "../../utils/date";
 
+import useUpdateProfile from "../../hooks/useUpdateProfile";
+import useFollow from '../../hooks/useFollow';
+
 const ProfilePage = () => {
   const [coverImg, setCoverImg] = useState(null);
   const [profileImg, setProfileImg] = useState(null);
@@ -24,7 +27,6 @@ const ProfilePage = () => {
   const {data: authUser} = useQuery({queryKey: ["authUser"]});
   console.log("authUser in Profile page: ", authUser);
   
-
   const coverImgRef = useRef(null);
   const profileImgRef = useRef(null);
 
@@ -46,12 +48,10 @@ const ProfilePage = () => {
       }
     },
   });
-  
-  useEffect(() => {
-    refetch();
-  },[username, refetch]);
 
-  const isMyProfile = authUser._id === user?._id.toString()
+  const isMyProfile = authUser._id === user?._id;
+  
+  const {updateProfile, isUpdatingProfile} = useUpdateProfile();
 
   const handleImageChange = (e, state) => {
     const file = e.target.files[0];
@@ -65,6 +65,24 @@ const ProfilePage = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  const handleUpdateProfile = async () => {
+    await updateProfile({coverImg, profileImg});
+    setCoverImg(null);
+    setProfileImg(null);
+  };
+
+  const {follow, isPending: isFollowing} = useFollow();
+  
+  const handleFollow = () => {
+    follow(user._id);
+  }
+  const isFollowed = authUser.following.includes(user._id);
+  
+  useEffect(() => {
+    refetch();
+  },[username, refetch]);
+
   return (
     <>
       <div className="flex-[4_4_0] border-r border-gray-700 min-h-screen">
@@ -143,24 +161,24 @@ const ProfilePage = () => {
               </div>
 
               <div className="flex justify-end px-4 mt-5">
-                {isMyProfile && <EditProfileModal />}
+                {isMyProfile && <EditProfileModal authUser={authUser} />}
                 {!isMyProfile && (
                   <button
                     className="btn btn-outline rounded-full btn-sm"
-                    onClick={() => toast.success("Followed successfully")}
+                    onClick={handleFollow}
                   >
-                    Follow
+                    {isFollowing && "Loading..."}
+                    {(!isFollowing && isFollowed) && "Following"}
+                    {(!isFollowing && !isFollowed) && "Follow"}
                   </button>
                 )}
 
                 {(coverImg || profileImg) && (
                   <button
                     className="btn btn-primary rounded-full btn-sm text-white px-4 ml-2"
-                    onClick={() =>
-                      toast.success("Profile updated successfully")
-                    }
+                    onClick={handleUpdateProfile}
                   >
-                    Update
+                    {isUpdatingProfile ? "Updating..." : "Update"}
                   </button>
                 )}
               </div>

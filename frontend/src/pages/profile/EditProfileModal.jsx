@@ -1,8 +1,9 @@
-import { useState } from "react";
-import toast from "react-hot-toast";
+import { useEffect, useState } from "react";
 import {IoMdClose} from 'react-icons/io';
+import useUpdateProfile from "../../hooks/useUpdateProfile";
 
-const EditProfileModal = () => {
+const EditProfileModal = ({authUser}) => {
+  const {updateProfile, isUpdatingProfile} = useUpdateProfile();
   const [formData, setFormData] = useState({
     fullName: '',
     username: '',
@@ -23,9 +24,22 @@ const EditProfileModal = () => {
   };
 
   const handleFormSubmit = (e) => {
-    e.preventdefault();
-    toast.success("Profile updated successfully")
-  }
+    e.preventDefault();
+    updateProfile(formData);
+  };
+
+  useEffect(() => {
+    if(authUser) {
+      setFormData({
+        fullName: authUser.fullName,
+        username: authUser.username,
+        email: authUser.email,
+        bio: authUser.bio,
+        link: authUser.link,
+      });
+    }
+    
+  },[authUser])
 
   return (
     <>
@@ -111,7 +125,7 @@ const EditProfileModal = () => {
             />
 
             <button className='btn btn-primary rounded-full btn-sm text-white'>
-              Update
+              {isUpdatingProfile ? "Updating..." : "Update"}
             </button>
           </form>
         </div>
@@ -125,4 +139,4 @@ const EditProfileModal = () => {
   )
 }
 
-export default EditProfileModal
+export default EditProfileModal;
