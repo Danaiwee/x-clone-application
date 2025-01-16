@@ -1,5 +1,4 @@
-![x_page-0001](https://github.com/user-attachments/assets/187ccb22-8116-450a-a976-9c3cee467a86)
-
+![x2_page-0001](https://github.com/user-attachments/assets/d8e04b00-c84c-4dda-abda-2acfbb6ae2ab)
 
 # X Platform Clone (MERN Stack)
 
