@@ -49,7 +49,7 @@ const ProfilePage = () => {
     },
   });
 
-  const isMyProfile = authUser._id === user?._id;
+  const isMyProfile = authUser?._id === user?._id;
   
   const {updateProfile, isUpdatingProfile} = useUpdateProfile();
 
@@ -77,7 +77,7 @@ const ProfilePage = () => {
   const handleFollow = () => {
     follow(user._id);
   }
-  const isFollowed = authUser.following.includes(user._id);
+  const isFollowed = authUser.following.includes(user?._id);
   
   useEffect(() => {
     refetch();
