@@ -2,11 +2,12 @@ import { useState } from "react"
 
 import XSvg from "../../../components/svg/X";
 
-import { MdOutlineMail } from "react-icons/md";
+
 import { MdPassword } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { FaUser } from "react-icons/fa";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -79,7 +80,7 @@ const LoginPage = () => {
             {"Let's"} go
           </h1>
           <label className='input input-bordered rounded flex items-center gap-2'>
-            <MdOutlineMail />
+            <FaUser />
             <input 
               type='text'
               className='grow'
