@@ -52,7 +52,7 @@ export const deletePost = async(req, res) => {
         };
 
         if(post.img){
-            const imgId = post.img.split('/').pop().split('.')[0];
+            const imgId = post.img.split('/').pop().split('.')[0]; // fjsdlfjsdl/jskdfslk/jkfsdjlk/jslfsdk.123
             await cloudinary.uploader.destroy(imgId);
         };
 
