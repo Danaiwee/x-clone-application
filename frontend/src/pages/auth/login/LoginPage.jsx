@@ -1,38 +1,36 @@
-import { useState } from "react"
-
-import XSvg from "../../../components/svg/X";
-
-
-import { MdPassword } from "react-icons/md";
+import { useState } from "react";
+import { MdOutlineMail, MdPassword } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { FaUser } from "react-icons/fa";
+
+import XSvg from "../../../components/svg/X";
+import InputField from "../../../components/common/InputField";
+import ButtonInput from "../../../components/common/ButtonInput";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
-    username: '',
-    password: ''
+    email: "",
+    password: "",
   });
 
   const queryClient = useQueryClient();
 
-  const {mutate: loginMutation, isError, isPending, error} = useMutation({
-    mutationFn: async ({username, password}) => {
+  const { mutate: loginMutation, isPending } = useMutation({
+    mutationFn: async ({ email, password }) => {
       try {
         const res = await fetch("/api/auth/login", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({username, password})
-        })
+          body: JSON.stringify({ email, password }),
+        });
 
         const data = await res.json();
-        if(!res.ok) throw new Error(data.error || "Failed to login");
+        if (!res.ok) throw new Error(data.error || "Failed to login");
 
         return data;
-
       } catch (error) {
         console.log("Error in login mutation", error);
         throw error;
@@ -41,87 +39,79 @@ const LoginPage = () => {
 
     onSuccess: () => {
       toast.success("Login successfully");
-      queryClient.invalidateQueries({queryKey: ["authUser"]});
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
 
     onError: (error) => {
       toast.error(error.message);
-    }
-  })
+    },
+  });
 
   const handleInputChange = (e) => {
-    const {name, value} = e.target;
+    const { name, value } = e.target;
 
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleFormSubmit = (e) => {
     e.preventDefault();
 
     loginMutation(formData);
   };
 
   return (
-    <div className='w-full mx-auto flex h-screen px-10 justify-center items-center'>
-      <div className='flex-1 hidden lg:flex items-center justify-center'>
-        <XSvg className='fill-white lg:w-2/3' />
+    <main className='max-w-screen mx-auto flex h-screen px-10 gap-5'>
+      <div className='flex-1 hidden lg:flex items-center justify-center px-4'>
+        <XSvg className='w-full fill-white' />
       </div>
 
-      <div className='flex-1 flex flex-col justify-center items-center'>
+      <div className='flex-1 flex flex-col justify-center items-center px-4'>
         <form
-          className='flex gap-4 flex-col w-2/3 mx-auto md:mx-20 lg:w-2/3'
-          onSubmit={handleSubmit}
+          className='w-full mx-auto md:mx-20 flex gap-4 flex-col'
+          onSubmit={handleFormSubmit}
         >
           <XSvg className='w-24 lg:hidden fill-white' />
-          <h1 className='text-4xl font-extrabold rounded flex items-center gap-2'>
-            {"Let's"} go
+          <h1 className='text-4xl font-extrabold text-white mb-5'>
+            Let&apos;s go
           </h1>
-          <label className='input input-bordered rounded flex items-center gap-2'>
-            <FaUser />
-            <input 
-              type='text'
-              className='grow'
-              placeholder='Username'
-              name='username'
-              value={formData.username}
-              onChange={handleInputChange}
-            />
 
-            </label>
-            <label className='input input-bordered rounded flex items-center gap-2'>
-              <MdPassword />
-              <input 
-                type='password'
-                className='grow'
-                placeholder="Password"
-                name='password'
-                value={formData.password}
-                onChange={handleInputChange}
-              />
-            </label>
+          <InputField
+            icon={MdOutlineMail}
+            name='email'
+            id='email'
+            type='email'
+            value={formData.email}
+            onChange={handleInputChange}
+            placeholder='john@email.com'
+          />
 
-            <button className='btn rounded-full btn-primary text-white'>
-              {isPending ? "Loging in..." : "Log in"}
-            </button>
-              {isError && (
-                <p className='text-red-500'>{error.message}</p>
-              )}
+          <InputField
+            icon={MdPassword}
+            name='password'
+            id='password'
+            type='password'
+            value={formData.password}
+            onChange={handleInputChange}
+            placeholder='●●●●●●●●'
+          />
+
+          <ButtonInput type='submit' text='Sign in' isLoading={isPending} />
         </form>
 
-        <div className='flex flex-col gap-2 mt-4'>
-          <p className='text-white text-lg'>{"Don't have an account ?"}</p>
-          <Link to='/signup'>
-              <button className='btn rounded-full btn-primary text-white btn-outline w-full'>
-                Sign Up
-              </button>
+        <div className='w-full flex items-center justify-center gap-1 mt-3'>
+          <p className='text-gray-500 text-sm font-semibold'>
+            Don&apos;t have an account?{" "}
+          </p>
+          <Link to='/signup' className='text-sm text-primary font-semibold'>
+            Sign up
           </Link>
-        </div>  
+        </div>
       </div>
-    </div>
-  )
-}
+    </main>
+  );
+};
 
-export default LoginPage
+export default LoginPage;

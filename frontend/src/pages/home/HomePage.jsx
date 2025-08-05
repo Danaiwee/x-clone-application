@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import CreatePost from '../home/CreatePost';
+import CreatePost from "../home/CreatePost";
 import Posts from "../../components/common/Posts";
 
 const HomePage = () => {
@@ -16,7 +16,7 @@ const HomePage = () => {
             onClick={() => setFeedType("forYou")}
           >
             For you
-            {feedType === 'forYou' && (
+            {feedType === "forYou" && (
               <div className='absolute bottom-0 w-10 h-1 rounded-full bg-primary'></div>
             )}
           </div>
@@ -26,7 +26,7 @@ const HomePage = () => {
             onClick={() => setFeedType("following")}
           >
             Following
-            {feedType === 'following' && (
+            {feedType === "following" && (
               <div className='absolute bottom-0 w-10 h-1 rounded-full bg-primary '></div>
             )}
           </div>
@@ -37,10 +37,9 @@ const HomePage = () => {
 
         {/*All Posts*/}
         <Posts feedType={feedType} />
-
       </div>
     </>
-  )
-}
+  );
+};
 
-export default HomePage
+export default HomePage;
