@@ -1,5 +1,5 @@
-import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from "cloudinary";
+import bcrypt from "bcryptjs";
 
 import User from "../models/user.model.js";
 import Notification from "../models/notification.model.js";
@@ -40,7 +40,7 @@ export const followUnfollow = async (req, res) => {
             await User.findByIdAndUpdate(id, {$pull: {followers: req.user._id}});
             await User.findByIdAndUpdate(req.user._id, {$pull: {following: id}});
 
-            res.status(200).json({message: "User unfollow successfully"});
+            return res.status(200).json({message: "User unfollow successfully"});
 
         } else {
             //follow the user
@@ -55,7 +55,7 @@ export const followUnfollow = async (req, res) => {
             });
 
             await newNotification.save();
-            res.status(200).json({message: "User followed successfully"});
+            return res.status(200).json({message: "User followed successfully"});
         }
 
     } catch (error) {
@@ -83,11 +83,11 @@ export const getSuggestedUsers = async (req, res) => {
         const suggestedUser = filteredUsers.slice(0,4);
         suggestedUser.forEach((user) => user.password = null);
 
-        res.status(200).json(suggestedUser);
+        return res.status(200).json(suggestedUser);
 
     } catch (error) {
         console.error("Error in suggested controller", error.message);
-        res.status(500).json({error: "Internal server error"});
+        return res.status(500).json({error: "Internal server error"});
     }
 };
 
@@ -155,10 +155,10 @@ export const updateUser = async (req, res) => {
         //hide password for response (not effected to database)
         user.password = null;
 
-        res.status(200).json(user);
+        return res.status(200).json(user);
 
     } catch (error) {
         console.error("Error in updateUser controller", error.message);
-        res.status(500).json({error: "Internal server error"});
+        return res.status(500).json({error: "Internal server error"});
     }
 };
